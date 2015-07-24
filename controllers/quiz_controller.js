@@ -15,7 +15,6 @@ exports.load = function(req, res, next, quizId){
 // GET /quizes
 exports.index = function(req, res){
 	var criterio = req.query.search;			// criterio de búsqueda en la base de datos
-<<<<<<< HEAD
 	if(criterio === undefined){					// no se ha escrito ningún texto a buscar
 		criterio = "%";							// mostrará todas las filas
 	}
@@ -25,16 +24,6 @@ exports.index = function(req, res){
 		criterio = criterio.toUpperCase();		// hacemos la búsqueda insensitiva
 	}
 	models.Quiz.findAll({ where: ["upper(pregunta) like ?", criterio] }).then(function(quizes){
-=======
-	if(criterio === undefined){
-		criterio = "%";
-	}
-	else{
-		criterio = "%" + criterio.trim() + "%";
-		criterio = criterio.replace(" ","%");
-	}
-	models.Quiz.findAll({where: ["pregunta like ?", criterio]}).then(function(quizes){
->>>>>>> 7edc1ea81b805829fae8769fa37da6d2ab9181fe
 		res.render('quizes/index', { quizes: quizes});
 	}
 	).catch(function(error){ next(error);})
