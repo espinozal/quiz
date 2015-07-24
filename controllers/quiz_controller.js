@@ -14,7 +14,16 @@ exports.load = function(req, res, next, quizId){
 
 // GET /quizes
 exports.index = function(req, res){
-	models.Quiz.findAll().then(function(quizes){
+	var criterio = req.query.search;			// criterio de búsqueda en la base de datos
+	if(criterio === undefined){					// no se ha escrito ningún texto a buscar
+		criterio = "%";							// mostrará todas las filas
+	}
+	else{
+		criterio = "%" + criterio.trim() + "%";	// se eliminan espacios en blanco y se utiliza comodín
+		criterio = criterio.replace(" ","%");	
+		criterio = criterio.toUpperCase();		// hacemos la búsqueda insensitiva
+	}
+	models.Quiz.findAll({ where: ["upper(pregunta) like ?", criterio] }).then(function(quizes){
 		res.render('quizes/index', { quizes: quizes});
 	}
 	).catch(function(error){ next(error);})
@@ -25,7 +34,7 @@ exports.show = function(req, res){
 	res.render('quizes/show', { quiz: req.quiz});
 };
 
-// GET /quizes/id:/answer
+// GET /quizes/:id/answer
 exports.answer = function(req, res){
 	var resultado = 'Incorrecto';
 	if (req.query.respuesta === req.quiz.respuesta) {
