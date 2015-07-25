@@ -23,7 +23,10 @@ exports.index = function(req, res){
 		criterio = criterio.replace(" ","%");	
 		criterio = criterio.toUpperCase();		// hacemos la búsqueda insensitiva
 	}
-	models.Quiz.findAll({ where: ["upper(pregunta) like ?", criterio] }).then(function(quizes){
+	models.Quiz.findAll({
+	 		where: ["upper(pregunta) like ?", criterio],
+	  		order: ["pregunta"]
+	}).then(function(quizes){
 		res.render('quizes/index', { quizes: quizes});
 	}
 	).catch(function(error){ next(error);})
@@ -46,4 +49,24 @@ exports.answer = function(req, res){
 // GET /author
 exports.author = function(req, res){
 	res.render('author', {nombre: 'Luis Enrique Espinoza'});
+};
+
+// GET quizes/new
+exports.new = function(req, res){
+	var quiz = models.Quiz.build(
+		{ pregunta: "Pregunta",
+		  respuesta: "Respuesta"
+		}
+		);
+
+	res.render('quizes/new', {quiz: quiz});
+};
+
+// POST /quizes/create
+exports.create = function(req, res){
+	var quiz = models.Quiz.build(req.body.quiz);
+// guarda en DB los campos pregunta y respuesta de quiz
+	quiz.save({fields: ["pregunta", "respuesta"]}).then(function(){
+		res.redirect('/quizes');      // redirección http a lista de preguntas
+	});
 };
