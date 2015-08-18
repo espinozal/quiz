@@ -33,6 +33,22 @@ app.use(function(req, res, next){
     res.locals.session = req.session;
     next();
 });
+
+// autologout, luego de 2 minutos sin realizar peticiones http
+app.use(function(req, res, next) {
+    var now = new Date().getTime();
+    req.session.timeOutSeg = 120;
+    if (req.session.lastVisit && req.session.user) {
+        if ((now - req.session.lastVisit) > req.session.timeOutSeg*1000) {
+            delete req.session.user;
+            res.redirect("login");
+        }
+    }
+    req.session.lastVisit = now;
+    res.locals.session = req.session
+    next();
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
